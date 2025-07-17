@@ -9,6 +9,6 @@ const router = express.Router();
 
 router.post("/login" , createUserController);
 router.post("/dataUser", createDataUserController);
-router.get("/getData", getUserByIdController);
+router.get("/getData/:id", getUserByIdController);
 
 export default router; 
