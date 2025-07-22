@@ -1,9 +1,12 @@
 import express from "express";
+import { createRoutineController } from "../controllers/routine_controllers.js";
+import { editRoutineController } from "../controllers/routine_controllers.js";
+import { deleteRoutineController } from "../controllers/routine_controllers.js";
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-    res.status(200).json({mensagem: "Rota funcionando"});
-});
+router.post("/createRoutine/:id", createRoutineController);
+router.patch("/editRoutine/:id", editRoutineController );
+router.delete("/deleteRoutine/:id", deleteRoutineController);
 
 export default router; 
