@@ -58,11 +58,23 @@ export async function editDataUser(dataUser, id){
 //Query pra deletar as informações
 export async function deleteUser(login_id){
     try{
+        const delRotina = await connection.query("DELETE FROM user_routine WHERE user_id= ?", [login_id]);
         const delUser = await connection.query("DELETE FROM user_data WHERE user_id = ?", [login_id]);
         const delLogin = await connection.query("DELETE FROM user_login WHERE id = ?", [login_id]);
     
     }catch(error){
         console.error("Não conseguiu deletar: ", error.message);
+        throw error
+    }
+}
+
+//Query pra mostrar as rotinas cadastradas em um usuário
+export async function getRoutineById(id){
+    try{
+        const [getRoutine] = await connection.query("SELECT user_login.id,user_login.user_name, user_routine.routine_name FROM user_login JOIN user_routine ON user_login.id = user_routine.user_id WHERE user_login.id = ?", [id]);
+        return getRoutine;
+    }catch(error){
+        console.error("Não conseguiu achar a rotina: ", error.message);
         throw error
     }
 }

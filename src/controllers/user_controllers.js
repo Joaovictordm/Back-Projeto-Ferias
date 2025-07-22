@@ -3,6 +3,7 @@ import {getUserById} from "../models/user_models.js";
 import { createDataUser } from "../models/user_models.js";
 import { editDataUser } from "../models/user_models.js";
 import { deleteUser } from "../models/user_models.js";
+import { getRoutineById } from "../models/user_models.js";
 
 
 //Controler da query que cria o usuário
@@ -70,3 +71,16 @@ export async function deleteUserController(req, res){
         res.status(500).json({mensagem: "Não deu pra deletar"})
     }
 }
+
+//Controller pra mostrar as rotinas do usuário
+export async function getRoutineByIdController(req, res){
+    try{
+        const id = req.params.id;
+        const mostrar = await getRoutineById(id);
+        res.status(200).json(mostrar)
+        return mostrar;
+    }catch(error){
+        console.error("Não achou a rotina, man: ", error.message);
+        res.status(500).json({mensagem: "Deu algum erro, mano"});
+    }
+} 
