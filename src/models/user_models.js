@@ -32,7 +32,7 @@ export async function createDataUser({ user_id, sex, age,weight, target_weight, 
 export async function getUserById(id){
     try{
         const [data] = await connection.query(  'SELECT user_login.id ,user_login.user_name, user_login.user_email, user_login.user_password, user_login.created_at, user_data.sex, user_data.age, user_data.weight, user_data.target_weight, user_data.height, user_data.level_physical_activity, user_data.created_at FROM user_login JOIN user_data ON user_login.id = user_data.user_id WHERE user_login.id = ?', [id] );
-        return data[0];
+        return data[0]; //Está retornando o primeiro array, por isso o []. Toda query SQL retorna um array, quando for mostrar um dado sempre coloca um [0] pra ele retornar apenas os primerios valores.
     }catch(error){
         console.error("Usuário não existe: ", error.message);
         throw error;
@@ -71,7 +71,7 @@ export async function deleteUser(login_id){
 //Query pra mostrar as rotinas cadastradas em um usuário
 export async function getRoutineById(id){
     try{
-        const [getRoutine] = await connection.query("SELECT user_login.id,user_login.user_name, user_routine.routine_name FROM user_login JOIN user_routine ON user_login.id = user_routine.user_id WHERE user_login.id = ?", [id]);
+        const [getRoutine] = await connection.query("SELECT user_login.user_name, user_routine.routine_name FROM user_login JOIN user_routine ON user_login.id = user_routine.user_id WHERE user_login.id = ?", [id]);
         return getRoutine;
     }catch(error){
         console.error("Não conseguiu achar a rotina: ", error.message);

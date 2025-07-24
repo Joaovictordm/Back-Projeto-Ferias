@@ -24,9 +24,9 @@ export async function createUserController(req, res){
 //Controler da query que cria os dados do usuário
 export async function createDataUserController(req, res){
     try{
-       
-        const {user_id , sex, age, weight, target_weight, height, level_physical_activity} = req.body;
-        const newData = await createDataUser({ user_id,sex, age, weight, target_weight, height, level_physical_activity});
+        const user_id = req.params.id;
+        const { sex, age, weight, target_weight, height, level_physical_activity} = req.body;
+        const newData = await createDataUser({ user_id ,sex, age, weight, target_weight, height, level_physical_activity});
         res.status(201).json({mensagem: "Usuário criado com sucesso! ", id: newData});
     } catch(error){
         console.error("Deu erro, man: ", error.message);
