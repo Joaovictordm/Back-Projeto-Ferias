@@ -13,7 +13,7 @@ const router = express.Router();
 router.get("/getData/:id", getUserByIdController);
 router.get("/rotinaUsuario/:id", getRoutineByIdController);
 router.post("/login" , createUserController);
-router.post("/dataUser", createDataUserController);
+router.post("/dataUser/:id", createDataUserController);
 router.patch("/editDataUser/:id", editDataUserController);
 router.delete("/delete/:id", deleteUserController);
 

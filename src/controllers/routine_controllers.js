@@ -1,6 +1,7 @@
 import { createRoutine } from "../models/routine_models.js";
 import { editRoutine } from "../models/routine_models.js";
 import { deleteRoutine } from "../models/routine_models.js";
+import { getExerciseById } from "../models/routine_models.js";
 
 //controller da query que cria a rotina
 export async function createRoutineController(req, res){
@@ -33,11 +34,23 @@ export async function editRoutineController(req, res){
 export async function deleteRoutineController(req , res){
     try{
         const id = req.params.id
-        const deletarRotina = await deleteRoutine({id});
+        const delRoutine = await deleteRoutine({id});
         res.status(200).json({mensagem: "Rotina deletada!"});
         
     }catch(error){
         console.error("Deu erro mano: ", error.message);
         res.status(400).json({mensagem: "Falha ao deletar!"})
+    }
+}
+
+//Controller pra mostrar os exercicios cadastrados em uma rotina
+export async function getExerciseByIdController(req, res){
+    try{
+        const id = req.params.id;
+        const getExercise = await getExerciseById({id});
+        res.status(200).json(getExercise);
+    }catch(error){
+        console.error(error.message);
+        res.status(400).json({message: "failure to query exercises"})
     }
 }
