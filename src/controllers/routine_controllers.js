@@ -3,47 +3,47 @@ import { editRoutine } from "../models/routine_models.js";
 import { deleteRoutine } from "../models/routine_models.js";
 import { getExerciseById } from "../models/routine_models.js";
 
-//controller da query que cria a rotina
+//Create a routine
 export async function createRoutineController(req, res){
     try{
         const user_id = req.params.id;
         const {routine_name} = req.body;
         const newRoutine = await createRoutine({user_id, routine_name});
-        res.status(201).json({mensagem: "Rotina criada com sucesso!", id: newRoutine });
+        res.status(201).json({message: "routine created successfully", id: newRoutine });
     }catch(error){
         console.error("Deu erro, man: ", error.message);
-        res.status(500).json({mensagem: "Erro ao criar rotina."})
+        res.status(500).json({message: "error creating the routine"})
     }
 }
 
-//controller da query pra editar a rotina
+//edit a routine
 export async function editRoutineController(req, res){
     try{
         const id = req.params.id;
         const routine_name = req.body;
 
         const editName = await editRoutine({routine_name, id});
-        res.status(200).json({mensagem: "Salvo!"})
+        res.status(200).json({message: "saved"})
     }catch(error){
         console.error("Deu ruim, mano: ", error.message);
-        res.status(400).json({mensagem: "Não atualizou!"})
+        res.status(400).json({message: "did not updtate"})
     }
 }
 
-//Controller pra deletar a rotina
+//delete a routine
 export async function deleteRoutineController(req , res){
     try{
         const id = req.params.id
         const delRoutine = await deleteRoutine({id});
-        res.status(200).json({mensagem: "Rotina deletada!"});
+        res.status(200).json({message: "routne deleted"});
         
     }catch(error){
         console.error("Deu erro mano: ", error.message);
-        res.status(400).json({mensagem: "Falha ao deletar!"})
+        res.status(400).json({message: "failed to delete"})
     }
 }
 
-//Controller pra mostrar os exercicios cadastrados em uma rotina
+//show the esercises
 export async function getExerciseByIdController(req, res){
     try{
         const id = req.params.id;
