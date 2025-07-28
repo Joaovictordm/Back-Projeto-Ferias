@@ -4,83 +4,97 @@ import { createDataUser } from "../models/user_models.js";
 import { editDataUser } from "../models/user_models.js";
 import { deleteUser } from "../models/user_models.js";
 import { getRoutineById } from "../models/user_models.js";
+import { getLoginByPassword } from "../models/user_models.js";
 
 
-//Controler da query que cria o usuário
+//create a user
 export async function createUserController(req, res){
     try{
         const {name, email, password } = req.body;
         const newUser = await createUser({name, email, password});
-        res.status(201).json({mensagem: "Usuário criado com sucesso!", id: newUser});
+        res.status(201).json({message: "User created successfully!", id: newUser});
          
-        
     } catch (error) {
-        console.error("Deu algum erro: ", error.message);
-        res.status(500).json({mensagem: "Erro ao criar o usuário."});
+        console.error(error.message);
+        res.status(500).json({message: "Error creating user."});
     }
 
 }
 
-//Controler da query que cria os dados do usuário
+//create user data
 export async function createDataUserController(req, res){
     try{
         const user_id = req.params.id;
         const { sex, age, weight, target_weight, height, level_physical_activity} = req.body;
         const newData = await createDataUser({ user_id ,sex, age, weight, target_weight, height, level_physical_activity});
-        res.status(201).json({mensagem: "Usuário criado com sucesso! ", id: newData});
+        res.status(201).json({message: "User data created successfully!", id: newData});
     } catch(error){
-        console.error("Deu erro, man: ", error.message);
-        res.status(500).json({mensagem: "Erro ao criar usuário."});
+        console.error(error.message);
+        res.status(500).json({message: "Error creating user data."});
     }
 }
 
-//Controler da query que mostra o usuário por id
+//show the user
 export async function getUserByIdController(req, res){
     try{
         const id = req.params.id;
-        const user = await getUserById(id);
+        const user = await getUserById({id});
         res.status(200).json(user)
         return user
     } catch(error){
-        console.error("Deu ruim: ", error.message);
-        res.status(404).json({mensagem: "O usuário não existe."})
+        console.error(error.message);
+        res.status(404).json({message: "User does not exist."})
     }
 }
 
-//Controler da query que atualiza uma informação
+//update an information
 export async function editDataUserController(req, res){
     try{
         const id = req.params.id;
         const data = req.body;
-        const editUser = await editDataUser(data,id);
-        res.status(200).json({mensagem: "Alteração feita com sucesso!"})
+        const editUser = await editDataUser({data,id});
+        res.status(200).json({message: "Data updated successfully!"})
     }catch(error){
-        console.error("Deu ruim, mano: ", error.message);
-        res.status(400).json({mensagem: "Deu algum erro, mano."})
+        console.error(error.message);
+        res.status(400).json({message: "Something went wrong."})
     }
 }
 
-//Controller pra deletar o usuário
+//delete a user
 export async function deleteUserController(req, res){
     try{
         const id_login = req.params.id;
-        const deletar = await deleteUser(id_login);
-        res.status(200).json({mensagem: "Usuário deletado com sucesso!"})
+        const deletar = await deleteUser({id_login});
+        res.status(200).json({message: "User deleted successfully!"})
     }catch(error){
-        console.error("Deu ruim, maninho: ", error.message);
-        res.status(500).json({mensagem: "Não deu pra deletar"})
+        console.error(error.message);
+        res.status(500).json({message: "Could not delete user."})
     }
 }
 
-//Controller pra mostrar as rotinas do usuário
+//show the routines
 export async function getRoutineByIdController(req, res){
     try{
         const id = req.params.id;
-        const mostrar = await getRoutineById(id);
+        const mostrar = await getRoutineById({id});
         res.status(200).json(mostrar)
         return mostrar;
     }catch(error){
-        console.error("Não achou a rotina, man: ", error.message);
-        res.status(500).json({mensagem: "Deu algum erro, mano"});
+        console.error(error.message);
+        res.status(500).json({message: "Error fetching routine."});
     }
 } 
+
+//check login
+export async function getLoginByPasswordController(req, res){
+    try{
+        const {email, password} = req.body;
+
+        const getLogin = await getLoginByPassword ({email, password}); 
+        
+        res.status(200).json(getLogin);
+    }catch(error){
+        res.status(400).json({message: "Invalid login credentials."});
+        console.error(error.message);
+    }
+}

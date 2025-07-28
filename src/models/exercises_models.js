@@ -8,7 +8,7 @@ export async function createExercise({routine_id, exercise_name}){
 
         return createExercise.insertId;
     }catch(error){
-        console.error("Deu erro, mano: ", error.message);
+        console.error(error.message);
         throw error;
     }
 }
@@ -35,10 +35,22 @@ export async function editExercise({exercise_name, exercise_id}){
 //model pra apagar o exercicío
 export async function deleteExercise({id}){
     try{
+        const deleteSerie = await connection.query ("DELETE FROM series WHERE exercise_id = ?", [id])
         const deleteExercise = await connection.query(" DELETE FROM exercise WHERE id = ?", [id]);
 
     }catch(error){
         console.error(error.message);
         throw error;
     }
+}
+
+//Model pra ver as series cadastradas a um exercicío
+export async function getSeriesById({id}){
+    try{
+        const [getserie] = await connection.query(" SELECT exercise.exercise_name, series.weight, series.reps FROM exercise JOIN series ON exercise.id = series.exercise_id WHERE exercise.id = ?", [id]);
+        return getserie;
+    }catch(error){
+        console.error(error.message);
+        throw error;
+    }   
 }
