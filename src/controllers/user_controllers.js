@@ -11,7 +11,13 @@ import { getLoginByPassword } from "../models/user_models.js";
 export async function createUserController(req, res){
     try{
         const {name, email, password } = req.body;
+
+          if (!name || !email || !password){
+            throw new Error ("Empty field")
+        }
+
         const newUser = await createUser({name, email, password});
+         
         res.status(201).json({message: "User created successfully!", id: newUser});
          
     } catch (error) {
@@ -26,6 +32,11 @@ export async function createDataUserController(req, res){
     try{
         const user_id = req.params.id;
         const { sex, age, weight, target_weight, height, level_physical_activity} = req.body;
+
+        if (!sex || !age || !weight || !target_weight || !height || !level_physical_activity){
+            throw new Error ("Empty field")
+        }
+
         const newData = await createDataUser({ user_id ,sex, age, weight, target_weight, height, level_physical_activity});
         res.status(201).json({message: "User data created successfully!", id: newData});
     } catch(error){
@@ -90,11 +101,22 @@ export async function getLoginByPasswordController(req, res){
     try{
         const {email, password} = req.body;
 
-        const getLogin = await getLoginByPassword ({email, password}); 
+        const getLogin = await getLoginByPassword ({email}); 
+
+        if (!getLogin){
+            throw new Error ("User not founded")
+        }
+
+        if (getLogin.user_password !== password){
+            throw new Error ("Password incorrect");
+        }
+
         
-        res.status(200).json(getLogin);
+
+        
+        res.status(200).json({message: "Sucess"});
     }catch(error){
-        res.status(400).json({message: "Invalid login credentials."});
+        res.status(400).json(error.message);
         console.error(error.message);
     }
 }

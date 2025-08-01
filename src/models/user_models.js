@@ -21,9 +21,11 @@ export async function createDataUser({ user_id, sex, age,weight, target_weight, 
             "INSERT INTO user_data(user_id ,sex, age, weight, target_weight, height, level_physical_activity) VALUES ( ?, ?, ?, ?, ?, ?, ?)",
             [user_id,sex, age, weight, target_weight, height, level_physical_activity]
         );
+        //retorna o ID criado na query. Quando eu coloco a função dentro do [] eu consigo retornar o id criado com o inserId.
         return newData.insertId;
     }catch(error){
         console.error(error.message);
+        //Sobe o erro pro controller
         throw error;
     }
 }
@@ -42,11 +44,18 @@ export async function getUserById({id}){
 //query pra editar as informações
 export async function editDataUser({dataUser, id}){
     try{
+        //Entries pega chave e valor de dataUser. Exemplo: "peso": "80", o entries transofrma em "peso", "80"
         const entries = Object.entries(dataUser);
+        //values faz a mesma coisa, porém ele pega só o valor. Se vier "peso": "80", ele descarta o "peso" e deixa só o valor que é "80"
         const values = Object.values(dataUser);
-       
+
+       //insert change faz uma inserção dinamica. .map é uma estruturta de repetição. ele vai pegar chave e valor de todos os valores do array entries. 
+       //Aqui ele descarta o valor e deixa só a chave, então ele vai pegar a chave e colocar em key. O valor ele vai descartar. 
+       //O nome disso é string dinamica, então ele guarda apenas o valor e retira a chave da string, nisso ele monta uma string mais o menos assim: "peso = ?". A gente vai inserir essa string lá no query 
         const insertChange = entries.map(([key,]) => `${key} = ?`).join(" , ");
-        
+      
+        //Aqui usamos o `` pra conseguir fazer a inserção da variável na query. Vamos inserir a string ali.
+        //Com isso o código fica muito dinamico. Ele consegue alterar qualquer campo que for colocado no body, não fica limitado apenas a 1 campo
         const data = await connection.query (`UPDATE user_data SET ${insertChange} WHERE user_id = ?`, [...values, id]); //Spread operator é os 3 pontos que eu coloquei. ELe espalha os valores do values dentro do array, pra n ficar um array dentro de outro
         
     }catch(error){
@@ -80,13 +89,14 @@ export async function getRoutineById({id}){
 }
 
 //Query pra verificar se existe na tabela 
-export async function getLoginByPassword({user_email, user_password}){
+export async function getLoginByPassword({email}){
     try{
-        const [getLogin] = await connection.query("SELECT user_email, user_password FROM user_login WHERE user_email = ? AND user_password = ?", [user_email, user_password]);
-        
-        return "Email e senha corretos";
+        const [getLogin] = await connection.query("SELECT user_email, user_password FROM user_login WHERE user_email = ?", [email]);
+       if (getLogin.length === 0){ return null};
+
+        return getLogin[0];
     }catch(error){
-        console.error("Usuário não existe");
+        console.error(error);
         throw error;
     }
 }
