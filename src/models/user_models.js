@@ -42,12 +42,12 @@ export async function getUserById({id}){
 }
 
 //query pra editar as informações
-export async function editDataUser({dataUser, id}){
+export async function editDataUser({data, id}){
     try{
         //Entries pega chave e valor de dataUser. Exemplo: "peso": "80", o entries transofrma em "peso", "80"
-        const entries = Object.entries(dataUser);
+        const entries = Object.entries(data);
         //values faz a mesma coisa, porém ele pega só o valor. Se vier "peso": "80", ele descarta o "peso" e deixa só o valor que é "80"
-        const values = Object.values(dataUser);
+        const values = Object.values(data);
 
        //insert change faz uma inserção dinamica. .map é uma estruturta de repetição. ele vai pegar chave e valor de todos os valores do array entries. 
        //Aqui ele descarta o valor e deixa só a chave, então ele vai pegar a chave e colocar em key. O valor ele vai descartar. 
@@ -56,7 +56,7 @@ export async function editDataUser({dataUser, id}){
       
         //Aqui usamos o `` pra conseguir fazer a inserção da variável na query. Vamos inserir a string ali.
         //Com isso o código fica muito dinamico. Ele consegue alterar qualquer campo que for colocado no body, não fica limitado apenas a 1 campo
-        const data = await connection.query (`UPDATE user_data SET ${insertChange} WHERE user_id = ?`, [...values, id]); //Spread operator é os 3 pontos que eu coloquei. ELe espalha os valores do values dentro do array, pra n ficar um array dentro de outro
+        const [rows] = await connection.query (`UPDATE user_data SET ${insertChange} WHERE user_id = ?`, [...values, id]); //Spread operator é os 3 pontos que eu coloquei. ELe espalha os valores do values dentro do array, pra n ficar um array dentro de outro
         
     }catch(error){
         console.error(error.message);
