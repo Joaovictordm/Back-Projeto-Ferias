@@ -63,6 +63,14 @@ export async function editDataUserController(req, res){
     try{
         const id = req.params.id;
         const data = req.body;
+
+        if (data.user_id || data.id){
+            throw new Error ("cannot change the id")
+        }
+
+        delete data.user_id;
+        delete data.id;
+
         const editUser = await editDataUser({data,id});
         res.status(200).json({message: "Data updated successfully!"})
     }catch(error){
@@ -75,6 +83,8 @@ export async function editDataUserController(req, res){
 export async function deleteUserController(req, res){
     try{
         const id_login = req.params.id;
+        
+
         const deletar = await deleteUser({id_login});
         res.status(200).json({message: "User deleted successfully!"})
     }catch(error){
@@ -100,20 +110,13 @@ export async function getRoutineByIdController(req, res){
 export async function getLoginByPasswordController(req, res){
     try{
         const {email, password} = req.body;
-
         const getLogin = await getLoginByPassword ({email}); 
-
         if (!getLogin){
             throw new Error ("User not founded")
         }
-
         if (getLogin.user_password !== password){
             throw new Error ("Password incorrect");
-        }
-
-        
-
-        
+        }     
         res.status(200).json({message: "Sucess"});
     }catch(error){
         res.status(400).json(error.message);
