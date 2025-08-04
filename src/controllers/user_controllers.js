@@ -19,7 +19,7 @@ export async function createUserController(req, res){
         //Verifica se tem algum simbolo como setas etc
         const visualSymbolsRegex = /[\u2600-\u26FF\u2700-\u27BF\u2190-\u21FF\u2200-\u22FF\u2300-\u23FF\u25A0-\u25FF]/u;
         //Verifica se tem algum emote
-        const emoji = emojiRegex();
+        const emojiRegex = emojiRegex();
 
 ;
 
@@ -27,7 +27,7 @@ export async function createUserController(req, res){
           if (!name || !email || !password){
             throw new Error ("Empty field")
         }
-         if (!validator.isEmail(email)){
+         if (!validator.isEmail(email) || emojiRegex.test(email) || visualSymbolsRegex.test(email)){
             throw new Error ("Invalid email format")
          }
          if (!specialCharRegex.test(name)){
