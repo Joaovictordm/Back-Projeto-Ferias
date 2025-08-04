@@ -5,16 +5,45 @@ import { editDataUser } from "../models/user_models.js";
 import { deleteUser } from "../models/user_models.js";
 import { getRoutineById } from "../models/user_models.js";
 import { getLoginByPassword } from "../models/user_models.js";
+import validator from "validator";
+import emojiRegex from "emoji-regex";
 
 
 //create a user
 export async function createUserController(req, res){
     try{
         const {name, email, password } = req.body;
+        //isso é uma expressão regular, ela começa no / e termina no /. Essa diz que tem q ter pelo menos um ou mais campos desses. Se tiver algo diferente ele dá erro. 
+        //o ^ significa que vai começar pelo começo da string e o & signiifca que vai terminar no final. O + significa que ele espera pelo menos um ou mais desses campos, se não tiver ou tiver algo diferente ele dá erro.
+        const specialCharRegex = /^[A-Za-zÀ-ÿ\s]+$/;
+        //Verifica se tem algum simbolo como setas etc
+        const visualSymbolsRegex = /[\u2600-\u26FF\u2700-\u27BF\u2190-\u21FF\u2200-\u22FF\u2300-\u23FF\u25A0-\u25FF]/u;
+        //Verifica se tem algum emote
+        const emoji = emojiRegex();
+
+;
+
 
           if (!name || !email || !password){
             throw new Error ("Empty field")
         }
+         if (!validator.isEmail(email)){
+            throw new Error ("Invalid email format")
+         }
+         if (!specialCharRegex.test(name)){
+            throw new Error ("invalid name")
+         }
+         if (!validador.isStrongPassword(password, {
+            minLength: 8,
+            minLowercase: 1,
+            minUppercase: 1,
+            minNumbers: 1,
+            minSymbols: 1
+            
+         })){
+            throw new Error ("Password must be at least 8 characters long and include lowercase, uppercase, number, and symbol.")
+         }
+                 
 
         const newUser = await createUser({name, email, password});
          
@@ -32,9 +61,14 @@ export async function createDataUserController(req, res){
     try{
         const user_id = req.params.id;
         const { sex, age, weight, target_weight, height, level_physical_activity} = req.body;
+        const getUser = await getUserById({id: user_id});
 
         if (!sex || !age || !weight || !target_weight || !height || !level_physical_activity){
             throw new Error ("Empty field")
+        }
+
+        if (!getUser){
+            throw new Error ("User does not exist")
         }
 
         const newData = await createDataUser({ user_id ,sex, age, weight, target_weight, height, level_physical_activity});
@@ -50,6 +84,11 @@ export async function getUserByIdController(req, res){
     try{
         const id = req.params.id;
         const user = await getUserById({id});
+        
+        if (!user){
+            throw new Error ("User does not exist")
+        }
+
         res.status(200).json(user)
         return user
     } catch(error){
@@ -84,7 +123,6 @@ export async function deleteUserController(req, res){
     try{
         const id_login = req.params.id;
         
-
         const deletar = await deleteUser({id_login});
         res.status(200).json({message: "User deleted successfully!"})
     }catch(error){
