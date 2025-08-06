@@ -100,3 +100,14 @@ export async function getLoginByPassword({email}){
         throw error;
     }
 }
+
+//Query pra pegar os dados do usuário 
+export async function verifUser({id}){
+    try{
+        const [rows] = await connection.query("SELECT id FROM user_login WHERE id = ?", [id]);
+        return rows[0];
+    }catch(error){
+        console.error(error);
+        throw error;
+    }
+}
