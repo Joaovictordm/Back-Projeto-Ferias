@@ -5,6 +5,7 @@ import { editDataUser } from "../models/user_models.js";
 import { deleteUser } from "../models/user_models.js";
 import { getRoutineById } from "../models/user_models.js";
 import { getLoginByPassword } from "../models/user_models.js";
+import { verifUser } from "../models/user_models.js";
 import validator from "validator";
 import emojiRegex from "emoji-regex";
 
@@ -15,36 +16,35 @@ export async function createUserController(req, res){
         const {name, email, password } = req.body;
         //isso é uma expressão regular, ela começa no / e termina no /. Essa diz que tem q ter pelo menos um ou mais campos desses. Se tiver algo diferente ele dá erro. 
         //o ^ significa que vai começar pelo começo da string e o & signiifca que vai terminar no final. O + significa que ele espera pelo menos um ou mais desses campos, se não tiver ou tiver algo diferente ele dá erro.
-        const specialCharRegex = /^[A-Za-zÀ-ÿ\s]+$/;
+       const specialCharRegex = /^[A-Za-zÀ-ÿ\s']+$/;
         //Verifica se tem algum simbolo como setas etc
         const visualSymbolsRegex = /[\u2600-\u26FF\u2700-\u27BF\u2190-\u21FF\u2200-\u22FF\u2300-\u23FF\u25A0-\u25FF]/u;
         //Verifica se tem algum emote
-        const emojiRegex = emojiRegex();
-
-;
+        const regexEmoji = emojiRegex();
+        //Verifica se tem algum simbolo estranho
+        const forbiddenEmailSymbolsRegex = /[(){}[\]|!#$%^&*+=~`'";:/?<>\s\\,]/;
 
 
           if (!name || !email || !password){
             throw new Error ("Empty field")
         }
-         if (!validator.isEmail(email) || emojiRegex.test(email) || visualSymbolsRegex.test(email)){
+         if (!validator.isEmail(email) || regexEmoji.test(email) || visualSymbolsRegex.test(email) || forbiddenEmailSymbolsRegex.test(email)){
             throw new Error ("Invalid email format")
          }
          if (!specialCharRegex.test(name)){
             throw new Error ("invalid name")
          }
-         if (!validador.isStrongPassword(password, {
+         if (!validator.isStrongPassword(password, {
             minLength: 8,
-            minLowercase: 1,
-            minUppercase: 1,
-            minNumbers: 1,
-            minSymbols: 1
+            minLowercase: 2,
+            minUppercase: 2,
+            minNumbers: 2,
+            minSymbols: 2
             
          })){
             throw new Error ("Password must be at least 8 characters long and include lowercase, uppercase, number, and symbol.")
          }
                  
-
         const newUser = await createUser({name, email, password});
          
         res.status(201).json({message: "User created successfully!", id: newUser});
@@ -61,16 +61,33 @@ export async function createDataUserController(req, res){
     try{
         const user_id = req.params.id;
         const { sex, age, weight, target_weight, height, level_physical_activity} = req.body;
-        const getUser = await getUserById({id: user_id});
+        const check = await verifUser({id: user_id});
 
+        //Verifica se é masculino ou feminino o que recebeu
+        const sexoRegex = /^(Masculino|Feminino)$/i;
+        //Verifica se é um númerio inteiro
+        const idadeRegex = /^\d+$/;
+        //verifica se é um numero com virgula ou ponto
+         const floatNumberRegex = /^\d+\.\d+$/;
+        //verifica se recebu ou baixo, modera ou alto
+        const physicalActivityRegex = /^(baixo|moderado|alto)$/i;
+        
         if (!sex || !age || !weight || !target_weight || !height || !level_physical_activity){
             throw new Error ("Empty field")
         }
-
-        if (!getUser){
+        if (!check){
             throw new Error ("User does not exist")
         }
-
+        if (
+        !sexoRegex.test(String(sex).trim()) || 
+        !idadeRegex.test(String(age).trim()) || 
+        !physicalActivityRegex.test(String(level_physical_activity).trim()) || 
+        !floatNumberRegex.test(String(weight).trim()) || 
+        !floatNumberRegex.test(String(target_weight).trim()) || 
+        !floatNumberRegex.test(String(height).trim())){
+            throw new Error ("field does not meet the expected standard")
+        }
+        
         const newData = await createDataUser({ user_id ,sex, age, weight, target_weight, height, level_physical_activity});
         res.status(201).json({message: "User data created successfully!", id: newData});
     } catch(error){
@@ -101,12 +118,20 @@ export async function getUserByIdController(req, res){
 export async function editDataUserController(req, res){
     try{
         const id = req.params.id;
-        const data = req.body;
+        const check = await verifUser({id});
 
-        if (data.user_id || data.id){
+        if(!check){
+            throw new Error ("User does not exist")
+        }
+
+        const data = req.body;
+        
+
+        if (data.user_id || data.id || data.created_at){
             throw new Error ("cannot change the id")
         }
 
+        delete data.created_at;
         delete data.user_id;
         delete data.id;
 
