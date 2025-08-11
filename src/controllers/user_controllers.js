@@ -13,39 +13,40 @@ import emojiRegex from "emoji-regex";
 //create a user
 export async function createUserController(req, res){
     try{
-        const {name, email, password } = req.body;
+        const data = req.body;
         //isso é uma expressão regular, ela começa no / e termina no /. Essa diz que tem q ter pelo menos um ou mais campos desses. Se tiver algo diferente ele dá erro. 
         //o ^ significa que vai começar pelo começo da string e o & signiifca que vai terminar no final. O + significa que ele espera pelo menos um ou mais desses campos, se não tiver ou tiver algo diferente ele dá erro.
        const specialCharRegex = /^[A-Za-zÀ-ÿ\s']+$/;
         //Verifica se tem algum simbolo como setas etc
-            // const visualSymbolsRegex = /[\u2600-\u26FF\u2700-\u27BF\u2190-\u21FF\u2200-\u22FF\u2300-\u23FF\u25A0-\u25FF]/u;
+            //  const visualSymbolsRegex = /[\u2600-\u26FF\u2700-\u27BF\u2190-\u21FF\u2200-\u22FF\u2300-\u23FF\u25A0-\u25FF]/u;
         //Verifica se tem algum emote
             // const regexEmoji = emojiRegex();
         //Verifica se tem algum simbolo estranho
              // const forbiddenEmailSymbolsRegex = /[(){}[\]|!#$%^&*+=~`'";:/?<>\s\\,]/;
 
 
-          if (!name || !email || !password){
+          if (!data.name || !data.email || !data.password){
             throw new Error ("Empty field")
         }
-         if (!validator.isEmail(email)){
+         if (!validator.isEmail(data.email)){
             throw new Error ("Invalid email format")
          }
-         if (!specialCharRegex.test(name)){
+         if (!specialCharRegex.test(data.name)){
             throw new Error ("invalid name")
          }
-         if (!validator.isStrongPassword(password, {
+
+         if (!validator.isStrongPassword(data.password, {
             minLength: 8,
-            minLowercase: 2,
-            minUppercase: 2,
-            minNumbers: 2,
-            minSymbols: 2
+            minLowercase: 1,
+            minUppercase: 1,
+            minNumbers: 1,
+            minSymbols: 1
             
          })){
             throw new Error ("Password must be at least 8 characters long and include 2 lowercase, 2 uppercase, 2 number, and 2 symbol.")
          }
                  
-        const newUser = await createUser({name, email, password});
+        const newUser = await createUser({name: data.name, email: data.email, password: data.password});
          
         res.status(201).json({message: "User created successfully!", id: newUser});
          
@@ -62,6 +63,7 @@ export async function createDataUserController(req, res){
         const user_id = req.params.id;
         const data = req.body;
         const check = await verifUser({id: user_id});
+
         
         if (!check){
             throw new Error ("User does not exist")
@@ -88,13 +90,21 @@ export async function createDataUserController(req, res){
         };
         for (const [field, regex] of Object.entries(dados)){
             
-
+            
             if (!regex.test(String(data[field]).trim())){
                 throw new Error (`Field does not meet the expected standard ${field}`);
             }
+            
         }
+        const convertionNumber = ["age", "height", "weight", "target_wheight"];
+        for (const convertion of convertionNumber){
+            if (data[convertion]){
+               data[convertion] =  parseFloat(data[convertion]);
+            }
+        }
+  
 
-        const newData = await createDataUser({user_id, sex: data.sex, age: data.age, weight: data.weight, target_weight: data.target_weight, height: data.height,level_physical_activity: data.level_physical_activity});
+        const newData = await createDataUser({user_id: user_id, data});
         
         res.status(201).json({message: "User data created successfully!", id: newData});
 
@@ -166,8 +176,8 @@ export async function editDataUserController(req, res){
 
         const convertionNumber = ["age", "height", "weight", "target_wheight"];
         for (const convertion of convertionNumber){
-            if (data.convertion) {
-                data.convertion = parseFloat(data.convertion);
+            if (data[convertion]) {
+                data[convertion] = parseFloat(data[convertion]);
             }
         }
 
@@ -211,14 +221,17 @@ export async function deleteUserController(req, res){
 export async function getRoutineByIdController(req, res){
     try{
         const id = req.params.id;
+        const check = await verifUser({id});
+        if (!check){
+            throw new Error ("User does not exist")
+        }
         const mostrar = await getRoutineById({id});
 
         if(!mostrar){
             throw new Error ("no routine registered")
         }
 
-        res.status(200).json(mostrar)
-        return mostrar;
+        res.status(200).json(mostrar);
     }catch(error){
         console.error(error.message);
         res.status(500).json({message: "Error fetching routine."});
@@ -243,6 +256,7 @@ export async function getLoginByPasswordController(req, res){
         if (getLogin.user_password !== password){
             throw new Error ("Password incorrect");
         }     
+
         res.status(200).json({message: "Sucess"});
     }catch(error){
         res.status(400).json(error.message);

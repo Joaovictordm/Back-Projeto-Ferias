@@ -2,11 +2,13 @@ import { createRoutine } from "../models/routine_models.js";
 import { editRoutine } from "../models/routine_models.js";
 import { deleteRoutine } from "../models/routine_models.js";
 import { getExerciseById } from "../models/routine_models.js";
+import { verifUser } from "../models/user_models.js";
 
 //Create a routine
 export async function createRoutineController(req, res){
     try{
         const user_id = req.params.id;
+        const check = await verifUser({user_id})
         const {routine_name} = req.body;
         const newRoutine = await createRoutine({user_id, routine_name});
         res.status(201).json({message: "routine created successfully", id: newRoutine });
