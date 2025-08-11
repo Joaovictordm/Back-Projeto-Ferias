@@ -15,11 +15,16 @@ export async function createUser({name, email, password}) {
 }
 
 //QUery para criar os dados do usuário
-export async function createDataUser({ user_id, sex, age,weight, target_weight, height, level_physical_activity }){
+export async function createDataUser({user_id, data}){
     try{
+        const entries = Object.entries(data);
+        const values = Object.values(data);
+
+        const stringDinamic = entries.map(([key, ]) => `${key}`).join(" ,")
+
         const [newData] = await connection.query(
-            "INSERT INTO user_data(user_id ,sex, age, weight, target_weight, height, level_physical_activity) VALUES ( ?, ?, ?, ?, ?, ?, ?)",
-            [user_id,sex, age, weight, target_weight, height, level_physical_activity]
+            `INSERT INTO user_data(user_id, ${stringDinamic}) VALUES (?, ?, ?, ?, ? , ?, ?)`,
+            [user_id, ...values]
         );
         //retorna o ID criado na query. Quando eu coloco a função dentro do [] eu consigo retornar o id criado com o inserId.
         return newData.insertId;
