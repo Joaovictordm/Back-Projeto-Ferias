@@ -1,10 +1,10 @@
 import {connection} from "../../db.js"
 
 //query pra criar uma rotina
-export async function createRoutine({user_id, routine_name}){
+export async function createRoutine({user_id, data}){
     try{
         const [newRoutine] = await connection.query(
-            "INSERT INTO user_routine(user_id, routine_name) VALUES (?, ?)", [user_id, routine_name]);
+            "INSERT INTO user_routine(user_id, routine_name) VALUES (?, ?)", [user_id, data]);
         return newRoutine.insertId;
     }catch(error){
         console.error(error.message);
@@ -47,5 +47,19 @@ export async function getExerciseById({id}){
     }catch(error){
         console.error(error.message);
         throw error;
+    }
+}
+
+export async function verifRoutine({id}){
+    try{
+        const [rows] = await connection.query ("SELECT routine_name FROM user_routine WHERE user_id = ?", [id]);
+    
+            delete rows.id;
+            delete rows.user_id;
+
+            return rows[0]
+        
+    }catch(error){
+
     }
 }
