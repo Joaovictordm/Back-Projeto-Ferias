@@ -5,7 +5,7 @@ import { getUserByIdController } from "../controllers/user_controllers.js";
 import { editDataUserController } from "../controllers/user_controllers.js";
 import { deleteUserController } from "../controllers/user_controllers.js";
 import { getRoutineByIdController } from "../controllers/user_controllers.js";
-import { getLoginByPasswordController } from "../controllers/user_controllers.js";
+import { getLoginByEmailController } from "../controllers/user_controllers.js";
 //Importa todas as funcções do controller pra uso
 
 
@@ -17,7 +17,7 @@ const router = express.Router();
 //Cada um declara aqui um caminho. Quando cada "/" for acessado, ele chama a função declarada lá em cima e executa essa função. Isso se chama endpoint
 router.get("/getData/:id", getUserByIdController);
 router.get("/rotinaUsuario/:id", getRoutineByIdController);
-router.get("/getLogin", getLoginByPasswordController);
+router.get("/getLogin", getLoginByEmailController);
 router.post("/login" , createUserController);
 router.post("/dataUser/:id", createDataUserController);
 router.patch("/editDataUser/:id", editDataUserController);

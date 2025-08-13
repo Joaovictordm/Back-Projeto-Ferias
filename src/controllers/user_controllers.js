@@ -4,7 +4,8 @@ import { createDataUser } from "../models/user_models.js";
 import { editDataUser } from "../models/user_models.js";
 import { deleteUser } from "../models/user_models.js";
 import { getRoutineById } from "../models/user_models.js";
-import { getLoginByPassword } from "../models/user_models.js";
+import { getLoginByEmail } from "../models/user_models.js";
+import  {getLoginByPassword} from "../models/user_models.js"
 import { verifUser } from "../models/user_models.js";
 import validator from "validator";
 import emojiRegex from "emoji-regex";
@@ -43,7 +44,7 @@ export async function createUserController(req, res){
             minSymbols: 1
             
          })){
-            throw new Error ("Password must be at least 8 characters long and include 2 lowercase, 2 uppercase, 2 number, and 2 symbol.")
+            throw new Error ("Password must be at least 8 characters long and include 1 lowercase, 1 uppercase, 1 number, and 1 symbol.")
          }
                  
         const newUser = await createUser({name: data.name, email: data.email, password: data.password});
@@ -96,7 +97,7 @@ export async function createDataUserController(req, res){
             }
             
         }
-        const convertionNumber = ["age", "height", "weight", "target_wheight"];
+        const convertionNumber = ["age", "height", "weight", "target_weight"];
         for (const convertion of convertionNumber){
             if (data[convertion]){
                data[convertion] =  parseFloat(data[convertion]);
@@ -197,20 +198,21 @@ export async function editDataUserController(req, res){
 export async function deleteUserController(req, res){
     try{
         const id_login = req.params.id;
-        const {confirm} = req.body;
-        const delRegex = /^Deletar$/;
+        const password = req.body;
+        const confirm = await getLoginByPassword({password});
         const check = await verifUser({id: id_login});
 
         if (!check){
             throw new Error ("User does not exist")
         }
 
-        if (delRegex.test(String(confirm).trim())){
-            
-            const deletar = await deleteUser({id_login});
-            res.status(200).json({message: "User deleted successfully!"})
-        }else{throw new Error ("Confirmation necessary")}
+        if (!confirm){
+            throw new Error ("password incorre")
+        }else{
 
+            const deletar = await deleteUser({id_login});
+            res.status(200).json({message: "User deleted successfully!"})          
+        }
     }catch(error){
         console.error(error.message);
         res.status(500).json({message: "Could not delete user."})
@@ -239,7 +241,7 @@ export async function getRoutineByIdController(req, res){
 } 
 
 //check login
-export async function getLoginByPasswordController(req, res){
+export async function getLoginByEmailController(req, res){
     try{
         const {email, password} = req.body;
         
@@ -247,7 +249,7 @@ export async function getLoginByPasswordController(req, res){
             throw new Error ("Incorrect email format ")
         }
 
-        const getLogin = await getLoginByPassword ({email}); 
+        const getLogin = await getLoginByEmail ({email}); 
 
         if (!getLogin){
             throw new Error ("User not founded")
