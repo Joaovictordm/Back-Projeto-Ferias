@@ -94,7 +94,7 @@ export async function getRoutineById({id}){
 }
 
 //Query pra verificar se existe na tabela 
-export async function getLoginByPassword({email}){
+export async function getLoginByEmail({email}){
     try{
         const [getLogin] = await connection.query("SELECT user_email, user_password FROM user_login WHERE user_email = ?", [email]);
        if (getLogin.length === 0){ return null};
@@ -116,3 +116,15 @@ export async function verifUser({id}){
         throw error;
     }
 }
+
+export async function getLoginByPassword({password}){
+    try{
+        const value = Object.values(password);
+        const rows = await connection.query ("SELECT user_password FROM user_login WHERE user_password = ?", [value]);
+        return rows[0] || null;
+    }catch(error){
+        console.log(error);
+        throw error;
+    }
+}
+
