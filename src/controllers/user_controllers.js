@@ -4,11 +4,13 @@ import { createDataUser } from "../models/user_models.js";
 import { editDataUser } from "../models/user_models.js";
 import { deleteUser } from "../models/user_models.js";
 import { getRoutineById } from "../models/user_models.js";
-import { getLoginByEmail } from "../models/user_models.js";
-import  {getLoginByPassword} from "../models/user_models.js"
 import { verifUser } from "../models/user_models.js";
+import { getLogin } from "../models/user_models.js";
+import { encryptPassword } from "../models/user_models.js";
+import { comparePassword } from "../models/user_models.js";
 import validator from "validator";
 import emojiRegex from "emoji-regex";
+import bcrypt, { compare } from "bcrypt";
 
 
 //create a user
@@ -46,8 +48,10 @@ export async function createUserController(req, res){
          })){
             throw new Error ("Password must be at least 8 characters long and include 1 lowercase, 1 uppercase, 1 number, and 1 symbol.")
          }
-                 
-        const newUser = await createUser({name: data.name, email: data.email, password: data.password});
+
+         const hash = await encryptPassword(data.password);
+         
+        const newUser = await createUser({name: data.name, email: data.email, password: hash});
          
         res.status(201).json({message: "User created successfully!", id: newUser});
          
@@ -198,8 +202,8 @@ export async function editDataUserController(req, res){
 export async function deleteUserController(req, res){
     try{
         const id_login = req.params.id;
-        const password = req.body;
-        const confirm = await getLoginByPassword({password});
+        
+
         const check = await verifUser({id: id_login});
 
         if (!check){
@@ -207,7 +211,7 @@ export async function deleteUserController(req, res){
         }
 
         if (!confirm){
-            throw new Error ("password incorre")
+            throw new Error ("password incorrect")
         }else{
 
             const deletar = await deleteUser({id_login});
@@ -240,28 +244,29 @@ export async function getRoutineByIdController(req, res){
     }
 } 
 
-//check login
-export async function getLoginByEmailController(req, res){
+export async function loginController(req, res){
     try{
-        const {email, password} = req.body;
-        
-        if (!validator.isEmail(email)){
-            throw new Error ("Incorrect email format ")
-        }
 
-        const getLogin = await getLoginByEmail ({email}); 
-
-        if (!getLogin){
-            throw new Error ("User not founded")
-        }
-        
-        if (getLogin.user_password !== password){
-            throw new Error ("Password incorrect");
-        }     
-
-        res.status(200).json({message: "Sucess"});
+     const {email, password} = req.body;
+     const check = await getLogin({email});
+     console.log(check)
+     
+     
+     if(!check){
+        throw new Error ("Email not founded")
+     }
+     const compare = await comparePassword(password, check);
+    console.log(compare)
+     if(compare){
+        console.log("User confirmed");
+        res.status(200).json({message: "confirmed"})
+     }else{
+        throw new Error ("Password incorrect")
+     }
+    
+     
     }catch(error){
-        res.status(400).json(error.message);
-        console.error(error.message);
+        console.log(error);
+        res.status(500).json({message: "Password or email incorrect "})
     }
 }
