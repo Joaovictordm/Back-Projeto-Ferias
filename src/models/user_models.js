@@ -106,7 +106,7 @@ export async function verifUser({id}){
     }
 }
 
-export async function getLogin({email}){
+export async function getLogin(email){
     try{
         const [rows] = await connection.query ("SELECT user_password FROM user_login WHERE user_email = ?", [email]);
 

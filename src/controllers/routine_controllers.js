@@ -16,6 +16,7 @@ export async function createRoutineController(req, res){
             throw new Error ("User does not exist")
         }
         
+        
         if (data.routine_name){
             const newRoutine = await createRoutine({user_id, data});
             res.status(201).json({message: "routine created successfully", id: newRoutine });
@@ -31,14 +32,18 @@ export async function createRoutineController(req, res){
 export async function editRoutineController(req, res){
     try{
         const id = req.params.id;
-        const routine_name = req.body;
-        const check = await verifRoutine({id});
+        const data = req.body;
 
+        delete data.id;
+        delete data.user_id;
+
+        const check = await verifRoutine(id);
         if (!check){
             throw new Error ("Routine does not exist")
         }
-        if (routine_name.routine_name){
-            const editName = await editRoutine({routine_name, id});
+
+        if (data.routine_name){
+            const editName = await editRoutine({routine_name: data}, id);
             res.status(200).json({message: "saved"})
             
         }else{
@@ -55,6 +60,11 @@ export async function deleteRoutineController(req , res){
     try{
         const id = req.params.id
         const delRoutine = await deleteRoutine({id});
+        
+        if (!delRoutine){
+            res.status(400).json({message: "user does not exist"})
+        }
+        
         res.status(200).json({message: "routne deleted"});
         
     }catch(error){

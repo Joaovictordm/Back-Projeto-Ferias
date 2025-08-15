@@ -202,21 +202,24 @@ export async function editDataUserController(req, res){
 export async function deleteUserController(req, res){
     try{
         const id_login = req.params.id;
-        
+        const data = req.body;
+        const regex = /^Deletar$/;
+
 
         const check = await verifUser({id: id_login});
-
         if (!check){
             throw new Error ("User does not exist")
         }
-
-        if (!confirm){
-            throw new Error ("password incorrect")
+        
+        if(!regex.test(data.delete)){
+            return res.status(401).json({message: "confirmation necessary"})
         }else{
 
             const deletar = await deleteUser({id_login});
             res.status(200).json({message: "User deleted successfully!"})          
+
         }
+
     }catch(error){
         console.error(error.message);
         res.status(500).json({message: "Could not delete user."})
@@ -247,16 +250,16 @@ export async function getRoutineByIdController(req, res){
 export async function loginController(req, res){
     try{
 
-     const {email, password} = req.body;
-     const check = await getLogin({email});
-     console.log(check)
+     const data = req.body;
+     const check = await getLogin(data.email);
+ 
      
      
      if(!check){
         throw new Error ("Email not founded")
      }
-     const compare = await comparePassword(password, check);
-    console.log(compare)
+     const compare = await comparePassword(data.password, check);
+    
      if(compare){
         console.log("User confirmed");
         res.status(200).json({message: "confirmed"})

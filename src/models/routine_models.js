@@ -14,8 +14,9 @@ export async function createRoutine({user_id, data}){
 }
 
 //query pra editar uma rotina
-export async function editRoutine({routine_name, id}){
+export async function editRoutine({routine_name}, id){
     try{
+        console.log(routine_name)
         const entries = Object.entries(routine_name);
         const values = Object.values(routine_name);
 
@@ -50,16 +51,14 @@ export async function getExerciseById({id}){
     }
 }
 
-export async function verifRoutine({id}){
+export async function verifRoutine(id){
     try{
-        const [rows] = await connection.query ("SELECT routine_name FROM user_routine WHERE user_id = ?", [id]);
-    
-            delete rows.id;
-            delete rows.user_id;
+        const [rows] = await connection.query ("SELECT routine_name FROM user_routine WHERE id = ?", [id]);
 
-            return rows[0]
+        return rows[0] || null;
         
     }catch(error){
-
+        console.log(error);
+        throw error;
     }
 }
