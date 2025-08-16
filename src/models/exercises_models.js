@@ -2,9 +2,9 @@ import {connection} from "../../db.js"
 
 
 //Model pra criar um exercic
-export async function createExercise({routine_id, exercise_name}){
+export async function createExercise({id, exercise_name}){
     try{
-        const [createExercise] = await connection.query ("INSERT INTO exercise(routine_id, exercise_name) VALUES (?, ?)", [routine_id, exercise_name]);
+        const [createExercise] = await connection.query ("INSERT INTO exercise(routine_id, exercise_name) VALUES (?, ?)", [id, exercise_name]);
 
         return createExercise.insertId;
     }catch(error){
@@ -38,6 +38,7 @@ export async function deleteExercise({id}){
         const deleteSerie = await connection.query ("DELETE FROM series WHERE exercise_id = ?", [id])
         const deleteExercise = await connection.query(" DELETE FROM exercise WHERE id = ?", [id]);
 
+        return deleteExercise || null;
     }catch(error){
         console.error(error.message);
         throw error;
