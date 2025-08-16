@@ -10,6 +10,9 @@ export async function createRoutineController(req, res){
     try{
         const user_id = req.params.id;
         const data = req.body;
+        
+        delete data.id;
+        delete data.user_id;
 
         const check = await verifUser({id: user_id});
         if (!check){
@@ -59,14 +62,18 @@ export async function editRoutineController(req, res){
 export async function deleteRoutineController(req , res){
     try{
         const id = req.params.id
-        const delRoutine = await deleteRoutine({id});
-        
-        if (!delRoutine){
-            res.status(400).json({message: "user does not exist"})
+        const {confirm} = req.body;
+        const regex = /^Deletar$/;
+
+        if (regex.test(String(confirm).trim())){
+            const delRoutine = await deleteRoutine({id});
+            if (!delRoutine){
+                res.status(400).json({message: "user does not exist"})
+            }else{
+                res.status(200).json({message: "Routine deleted"})
+            }
+
         }
-        
-        res.status(200).json({message: "routne deleted"});
-        
     }catch(error){
         console.error("Deu erro mano: ", error.message);
         res.status(400).json({message: "failed to delete"})
