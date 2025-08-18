@@ -55,3 +55,13 @@ export async function getSeriesById({id}){
         throw error;
     }   
 }
+
+export async function exerciseId(id){
+    try{
+        const [rows] = await connection.query( "SELECT id FROM exercise WHERE id = ?", [id]);
+        return rows[0];
+    }catch(error){
+        console.error(error);
+        throw error;
+    }
+}
