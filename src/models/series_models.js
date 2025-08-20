@@ -27,10 +27,19 @@ export async function previousSerie({exercise_id}){
 //Model pra deletar a série
 export async function delSerie({id}){
     try{
-        const del = await connection.query ("DELETE FROM series WHERE id = ?", [id]);
-
+        const [del] = await connection.query ("DELETE FROM series WHERE id = ?", [id]);
     }catch(error){
         console.error(error.message);
+        throw error;
+    }
+}
+
+export async function getSerie(id){
+    try{
+        const [rows] = await connection.query("SELECT id FROM series WHERE id = ?", [id]);
+        return rows[0] || null;
+    }catch(error){
+        console.error(error);
         throw error;
     }
 }

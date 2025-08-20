@@ -2,24 +2,24 @@ import { createSerie } from "../models/series_models.js";
 import { previousSerie } from "../models/series_models.js";
 import { delSerie } from "../models/series_models.js";
 import { exerciseId } from "../models/exercises_models.js";
+import { getSerie } from "../models/series_models.js";
+import validator from "validator";
 
 //Create a series
 export async function createSerieController(req, res){
     try{
         const id = req.params.id;
-        const data = req.body;
+        const {weight, reps} = req.body;
         const check = await exerciseId(id);
-        
-        
         if(!check){
            return res.status(400).json({message: "exercise does not exist "})
         }
 
-        delete data.id
-        delete data.exercise_id;
+        if (!validator.isInt(reps.toString() || !validator.isFloat(weight.toString()))){
+            return res.status(404).json({message: "empty field"})
+        }else{
 
-        if(data.weight && data.reps){
-            const create = await createSerie({id, weight: data.weight, reps: data.reps});
+            const create = await createSerie({id, weight: weight, reps: reps});
             res.status(200).json({message: "series added", id: create});
 
         }
@@ -36,10 +36,13 @@ export async function createSerieController(req, res){
 export async function previousSerieController(req, res){
     try{
         const exercise_id = req.params.exercise_id
-
-        const prev = await previousSerie({exercise_id});
-
-        res.status(200).json(prev)
+        const check = await exerciseId(exercise_id);
+        if(!check){
+            return res.status(400).json({message: "exercise does not exist"})
+        }else{
+            const prev = await previousSerie({exercise_id});
+            res.status(200).json(prev)
+        }
     }catch(error){
         console.error(error.message);
         res.status(400).json({message: "Error when consulting previous"})
@@ -50,9 +53,15 @@ export async function previousSerieController(req, res){
 export async function delSerieController(req, res){
     try{
         const id = req.params.id;
+        const check = await getSerie(id);
+        if(!check){
+            return res.status(404).json({message: "serie does not exist"})
+        }else{
+            const del = delSerie({id});
+            res.status(200).json({message: "Serie deleted"})
+        }
 
-        const del = delSerie({id});
-        res.status(200).json({message: "series deleted"});
+       
     }catch(error){
         console.error(error.message);
         res.status(400).json({message: "Error deleting"})
