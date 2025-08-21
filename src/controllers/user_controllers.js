@@ -93,20 +93,21 @@ export async function createDataUserController(req, res){
             height: floatNumberRegex,
             level_physical_activity: physicalActivityRegex
         };
+
         for (const [field, regex] of Object.entries(dados)){
             
-            
-            if (!regex.test(String(data[field]).trim())){
+            if (!regex.test(data[field])){
                 throw new Error (`Field does not meet the expected standard ${field}`);
             }
             
         }
-        const convertionNumber = ["age", "height", "weight", "target_weight"];
-        for (const convertion of convertionNumber){
-            if (data[convertion]){
-               data[convertion] =  parseFloat(data[convertion]);
-            }
-        }
+
+        // const convertionNumber = ["age", "height", "weight", "target_weight"];
+        // for (const convertion of convertionNumber){
+        //     if (data[convertion]){
+        //        data[convertion] =  parseFloat(data[convertion]);
+        //     }
+        // }
   
 
         const newData = await createDataUser({user_id: user_id, data});
@@ -124,11 +125,11 @@ export async function getUserByIdController(req, res){
     try{
         const id = req.params.id;
         const user = await getUserById({id});
-        
+
         if (!user){
             throw new Error ("User does not exist")
         }
-
+        
         res.status(200).json(user)
         return user
     } catch(error){
@@ -142,6 +143,7 @@ export async function editDataUserController(req, res){
     try{
         const id = req.params.id;
         const check = await verifUser({id});
+        
 
         //Verifica se é masculino ou feminino o que recebeu
         const sexoRegex = /^(Masculino|Feminino)$/i;
@@ -155,8 +157,10 @@ export async function editDataUserController(req, res){
         if(!check){
             throw new Error ("User does not exist")
         }
+        
         const data = req.body;
 
+        
         const validations = {
             sex: sexoRegex,
             age: idadeRegex,
@@ -167,30 +171,36 @@ export async function editDataUserController(req, res){
         }
         
         for (const [key, regex] of Object.entries(validations)){
-            if (data[key] && !regex.test(String(data[key]).trim())){
+            if (data[key] && !regex.test(data[key])){
                 throw new Error (`Invalid value for field ${key}`)
             };
         }
+        
+        // const forbidenFields = ["user_id", "id", "created_at"];
+        // for (const field of forbidenFields){
+        //     if (field in data ){
+        //         throw new Error (`Cannot change the field ${field}`)
+        //     }
+        // }
+        
+        // const convertionNumber = ["age", "height", "weight", "target_wheight"];
+        // for (const convertion of convertionNumber){
+            //     if (data[convertion]) {
+                //         data[convertion] = parseFloat(data[convertion]);
+                //     }
+                // }
+            const allowedColumns = ["sex", "age", "height", "weight", "target_weight", "level_physical_activity"];
+            const update = {};
 
-        const forbidenFields = ["user_id", "id", "created_at"];
-        for (const field of forbidenFields){
-            if (field in data ){
-                throw new Error (`Cannot change the field ${field}`)
+            for (const key of allowedColumns){
+                if(data[key]){
+                    update[key] = data[key]
+                }
             }
-        }
-
-        const convertionNumber = ["age", "height", "weight", "target_wheight"];
-        for (const convertion of convertionNumber){
-            if (data[convertion]) {
-                data[convertion] = parseFloat(data[convertion]);
-            }
-        }
-
-        delete data.created_at;
-        delete data.user_id;
-        delete data.id;
-
-        const editUser = await editDataUser({data,id});
+            const editUser = await editDataUser({data: update, id: id}); 
+                
+                
+            // const editUser = await editDataUser({data,id});
         res.status(200).json({message: "Data updated successfully!"})
     }catch(error){
         console.error(error.message);
