@@ -11,9 +11,6 @@ export async function createRoutineController(req, res){
         const user_id = req.params.id;
         const data = req.body;
         
-        delete data.id;
-        delete data.user_id;
-
         const check = await verifUser({id: user_id});
         if (!check){
             throw new Error ("User does not exist")
@@ -21,7 +18,7 @@ export async function createRoutineController(req, res){
         
         
         if (data.routine_name){
-            const newRoutine = await createRoutine({user_id, data});
+            const newRoutine = await createRoutine({user_id, data: data.routine_name});
             res.status(201).json({message: "routine created successfully", id: newRoutine });
        
         }else{throw new Error("Unexpected field")}
@@ -37,21 +34,23 @@ export async function editRoutineController(req, res){
         const id = req.params.id;
         const data = req.body;
 
-        delete data.id;
-        delete data.user_id;
-
         const check = await verifRoutine(id);
         if (!check){
             throw new Error ("Routine does not exist")
         }
 
-        if (data.routine_name){
-            const editName = await editRoutine({routine_name: data}, id);
-            res.status(200).json({message: "saved"})
-            
-        }else{
-            throw new Error ("Unexpected field")
+        const allowedFields = ["routine_name", "id" ];
+        const update = {};
+
+        for (const key of allowedFields){
+            if(data[key]){
+                update[key] = data[key];
+            }
         }
+
+         const editName = await editRoutine({routine_name: update, id});
+         res.status(200).json({message: "updated routine"})
+         
     }catch(error){
         console.error("Deu ruim, mano: ", error.message);
         res.status(400).json({message: "did not updtate"})
@@ -64,15 +63,17 @@ export async function deleteRoutineController(req , res){
         const id = req.params.id
         const {confirm} = req.body;
         const regex = /^Deletar$/;
+        const check = await verifRoutine(id);
 
-        if (regex.test(String(confirm).trim())){
+        if(!check){
+            return res.status(456).json({message: "routine does not exist"})
+        }
+
+        if (regex.test(confirm)){
             const delRoutine = await deleteRoutine({id});
-            if (!delRoutine){
-                res.status(400).json({message: "user does not exist"})
-            }else{
-                res.status(200).json({message: "Routine deleted"})
-            }
-
+            return res.status(200).json("routine deleted")
+        }else{
+            return res.status(345).json("Confirmation necessary")
         }
     }catch(error){
         console.error("Deu erro mano: ", error.message);

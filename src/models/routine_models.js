@@ -14,12 +14,12 @@ export async function createRoutine({user_id, data}){
 }
 
 //query pra editar uma rotina
-export async function editRoutine({routine_name}, id){
+export async function editRoutine({routine_name, id}){
     try{
-        console.log(routine_name)
+       
+        //Auqi eu tenho que tomar cuidado para não passar algo que não seja um objeto. Se eu passar, por exemplo, perna, ele vai desestruturar a string perna. Eu tenho que garantir que vai vir um objeto. routine_name: perna, assim ele faz a separação correta do que é chave e do que é valor
         const entries = Object.entries(routine_name);
         const values = Object.values(routine_name);
-
         //string de atualização dinamica. Termo técnico Array destructuring ou desestruturação de array. o key está dentro do [] pq é um array. A virgula é nescessária pq o padrão é vir keys e values, a gente tá pegando apenas as keys, a virgula ajuda a pular o values
         const insertChange = entries.map(([key,]) => `${key} = ?`).join(" , ");//Interpolação é a inserção de uma string no texto. Nesse cado estámos inserindo o array key no texto.
 
