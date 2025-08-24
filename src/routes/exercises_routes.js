@@ -2,7 +2,7 @@ import express from "express";
 import { createExerciseController } from "../controllers/exercises_controllers.js";
 import { editExerciseController } from "../controllers/exercises_controllers.js";
 import { deleteExerciseController } from "../controllers/exercises_controllers.js";
-import { getSerieByIdController } from "../controllers/exercises_controllers.js";
+import { getSerieByIdController } from "../controllers/series_controllers.js";
 //Importa todas as funcções do controller pra uso
 
 //cria uma constante que usa as rotas do express

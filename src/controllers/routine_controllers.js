@@ -1,7 +1,7 @@
 import { createRoutine } from "../models/routine_models.js";
 import { editRoutine } from "../models/routine_models.js";
 import { deleteRoutine } from "../models/routine_models.js";
-import { getExerciseById } from "../models/routine_models.js";
+import { getRoutineById } from "../models/user_models.js";
 import { verifUser } from "../models/user_models.js";
 import { verifRoutine } from "../models/routine_models.js";
 
@@ -81,14 +81,28 @@ export async function deleteRoutineController(req , res){
     }
 }
 
-//show the esercises
-export async function getExerciseByIdController(req, res){
+
+//show the routines
+export async function getRoutineByIdController(req, res){
     try{
         const id = req.params.id;
-        const getExercise = await getExerciseById({id});
-        res.status(200).json(getExercise);
+        const check = await verifUser({id});
+        if (!check){
+            throw new Error ("User does not exist")
+        }else{
+            
+            const mostrar = await getRoutineById({id});
+            if(!mostrar){
+                throw new Error ("no routine registered")
+            }else{
+                res.status(200).json(mostrar);
+
+            }
+        }
+
     }catch(error){
         console.error(error.message);
-        res.status(400).json({message: "failure to query exercises"})
+        res.status(500).json({message: "Error fetching routine."});
     }
-}
+} 
+
