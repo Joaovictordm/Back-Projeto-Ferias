@@ -3,6 +3,7 @@ import { previousSerie } from "../models/series_models.js";
 import { delSerie } from "../models/series_models.js";
 import { exerciseId } from "../models/exercises_models.js";
 import { getSerie } from "../models/series_models.js";
+import { getSeriesById } from "../models/exercises_models.js";
 import validator from "validator";
 
 //Create a series
@@ -65,5 +66,17 @@ export async function delSerieController(req, res){
     }catch(error){
         console.error(error.message);
         res.status(400).json({message: "Error deleting"})
+    }
+}
+
+//show the series of an exercise
+export async function getSerieByIdController(req, res){
+    try{
+        const id = req.params.id;
+        const getSerie = await getSeriesById({id});
+        res.status(200).json(getSerie);
+    }catch(error){
+        res.status( 400).json({message: "No series found"});
+        console.error(error.message);
     }
 }

@@ -235,29 +235,6 @@ export async function deleteUserController(req, res){
     }
 }
 
-//show the routines
-export async function getRoutineByIdController(req, res){
-    try{
-        const id = req.params.id;
-        const check = await verifUser({id});
-        if (!check){
-            throw new Error ("User does not exist")
-        }else{
-            
-            const mostrar = await getRoutineById({id});
-            if(!mostrar){
-                throw new Error ("no routine registered")
-            }else{
-                res.status(200).json(mostrar);
-
-            }
-        }
-
-    }catch(error){
-        console.error(error.message);
-        res.status(500).json({message: "Error fetching routine."});
-    }
-} 
 
 export async function loginController(req, res){
     try{

@@ -4,7 +4,7 @@ import { createDataUserController } from "../controllers/user_controllers.js";
 import { getUserByIdController } from "../controllers/user_controllers.js";
 import { editDataUserController } from "../controllers/user_controllers.js";
 import { deleteUserController } from "../controllers/user_controllers.js";
-import { getRoutineByIdController } from "../controllers/user_controllers.js";
+import { getRoutineByIdController } from "../controllers/routine_controllers.js";
 import { loginController } from "../controllers/user_controllers.js";
 //Importa todas as funcções do controller pra uso
 
