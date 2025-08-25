@@ -3,14 +3,13 @@ import {getUserById} from "../models/user_models.js";
 import { createDataUser } from "../models/user_models.js";
 import { editDataUser } from "../models/user_models.js";
 import { deleteUser } from "../models/user_models.js";
-import { getRoutineById } from "../models/user_models.js";
 import { verifUser } from "../models/user_models.js";
 import { getLogin } from "../models/user_models.js";
 import { encryptPassword } from "../models/user_models.js";
 import { comparePassword } from "../models/user_models.js";
 import validator from "validator";
 import emojiRegex from "emoji-regex";
-import bcrypt, { compare } from "bcrypt";
+
 
 
 //create a user
@@ -26,16 +25,14 @@ export async function createUserController(req, res){
             // const regexEmoji = emojiRegex();
         //Verifica se tem algum simbolo estranho
              // const forbiddenEmailSymbolsRegex = /[(){}[\]|!#$%^&*+=~`'";:/?<>\s\\,]/;
-
-
           if (!data.name || !data.email || !data.password){
-            throw new Error ("Empty field")
+            return res.status(400).json("Empty field")
         }
          if (!validator.isEmail(data.email)){
-            throw new Error ("Invalid email format")
+            return res.status(400).json("Invalid email format")
          }
          if (!specialCharRegex.test(data.name)){
-            throw new Error ("invalid name")
+            return res.status(400).json("Invalid name format")
          }
 
          if (!validator.isStrongPassword(data.password, {

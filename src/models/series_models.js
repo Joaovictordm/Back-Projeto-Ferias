@@ -43,3 +43,14 @@ export async function getSerie(id){
         throw error;
     }
 }
+
+//Model pra ver as series cadastradas a um exercicío
+export async function getSeriesById({id}){
+    try{
+        const [getserie] = await connection.query(" SELECT exercise.exercise_name, series.weight, series.reps FROM exercise JOIN series ON exercise.id = series.exercise_id WHERE exercise.id = ?", [id]);
+        return getserie;
+    }catch(error){
+        console.error(error.message);
+        throw error;
+    }   
+}

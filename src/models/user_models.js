@@ -83,16 +83,7 @@ export async function deleteUser({id_login}){
     }
 }
 
-//Query pra mostrar as rotinas cadastradas em um usuário
-export async function getRoutineById({id}){
-    try{
-        const [getRoutine] = await connection.query("SELECT user_login.user_name, user_routine.routine_name FROM user_login JOIN user_routine ON user_login.id = user_routine.user_id WHERE user_login.id = ?", [id]);
-        return getRoutine;
-    }catch(error){
-        console.error(error.message);
-        throw error
-    }
-}
+
 
 
 //Query pra pegar os dados do usuário 
