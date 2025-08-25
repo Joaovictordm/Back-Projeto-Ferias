@@ -43,7 +43,7 @@ export async function createUserController(req, res){
             minSymbols: 1
             
          })){
-            throw new Error ("Password must be at least 8 characters long and include 1 lowercase, 1 uppercase, 1 number, and 1 symbol.")
+            return res.status(400),json("Password must be at least 8 characters long and include 1 lowercase, 1 uppercase, 1 number, and 1 symbol.")
          }
 
          const hash = await encryptPassword(data.password);
