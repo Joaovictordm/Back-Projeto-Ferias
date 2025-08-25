@@ -1,7 +1,7 @@
 import { createRoutine } from "../models/routine_models.js";
 import { editRoutine } from "../models/routine_models.js";
 import { deleteRoutine } from "../models/routine_models.js";
-import { getRoutineById } from "../models/user_models.js";
+import { getRoutineById } from "../models/routine_models.js";
 import { verifUser } from "../models/user_models.js";
 import { verifRoutine } from "../models/routine_models.js";
 
