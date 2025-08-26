@@ -14,7 +14,7 @@ export async function createExerciseController(req, res){
         const check = await verifRoutine(id);
 
         if(!check){
-            return res.status(423).json("routine does not exist")
+            throw new Error ("routine does not exist")
         }
 
         if(data.exercise_name){
@@ -39,7 +39,7 @@ export async function editExerciseController (req, res){
         const check = await exerciseId(id);
 
         if(!check){
-            return res.status(400).json("Exercise does not exist")
+            throw new Error ("Exercise does not exist")
         }
 
         for (const key of allowedFields){
@@ -64,7 +64,7 @@ export async function deleteExerciseController(req, res){
         const check = await exerciseId(id);
 
         if(!check){
-            return res.status(400).json("exercise does not exist")
+            throw new Error ("exercise does not exist")
         }
         if(regex.test(confirm)){
             const delExercise = await deleteExercise({id})
@@ -87,7 +87,7 @@ export async function getExerciseByIdController(req, res){
         const id = req.params.id;
         const check = await verifRoutine(id);
         if (!check){
-            return res.status(400).json("Routine does not exist")
+            throw new Error ("Routine does not exist")
         }else{
             const getExercise = await getExerciseById({id});
             res.status(200).json(getExercise);
