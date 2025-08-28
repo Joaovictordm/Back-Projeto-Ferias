@@ -99,7 +99,7 @@ export async function verifUser({id}){
 
 export async function getLogin(email){
     try{
-        const [rows] = await connection.query ("SELECT user_password FROM user_login WHERE user_email = ?", [email]);
+        const [rows] = await connection.query ("SELECT user_password, id, user_email FROM user_login WHERE user_email = ?", [email]);
 
         //Usar o return assim é bom pra quando quer retornar apenas um campo, como por exemplo o user_password. Ele vê se o rows existe e retorna o password
         return rows[0]?.user_password;
