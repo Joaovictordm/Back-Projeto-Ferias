@@ -7,6 +7,8 @@ import { verifUser } from "../models/user_models.js";
 import { getLogin } from "../models/user_models.js";
 import { encryptPassword } from "../models/user_models.js";
 import { comparePassword } from "../models/user_models.js";
+import { generateToken } from "./jwt_controllers.js";
+import { verifyToken } from "./jwt_controllers.js";
 import validator from "validator";
 import emojiRegex from "emoji-regex";
 
@@ -60,10 +62,10 @@ export async function createDataUserController(req, res){
     try{
         const user_id = req.params.id;
         const data = req.body;
-        const check = await verifUser({id: user_id});
+        const user = await verifUser({id: user_id});
 
         
-        if (!check){
+        if (!user){
             throw new Error ("User does not exist")
         }
         //Verifica se é masculino ou feminino o que recebeu
@@ -128,7 +130,7 @@ export async function getUserByIdController(req, res){
 export async function editDataUserController(req, res){
     try{
         const id = req.params.id;
-        const check = await verifUser({id});
+        const user = await verifUser({id});
     
         //Verifica se é masculino ou feminino o que recebeu
         const sexoRegex = /^(Masculino|Feminino)$/i;
@@ -139,7 +141,7 @@ export async function editDataUserController(req, res){
         //verifica se recebu ou baixo, modera ou alto
         const physicalActivityRegex = /^(baixo|moderado|alto)$/i;
 
-        if(!check){
+        if(!user){
             throw new Error ("User does not exist")
         }
         
@@ -198,8 +200,8 @@ export async function deleteUserController(req, res){
         const regex = /^Deletar$/;
 
 
-        const check = await verifUser({id: id_login});
-        if (!check){
+        const user = await verifUser({id: id_login});
+        if (!user){
             throw new Error ("User does not exist")
         }
         
@@ -223,19 +225,21 @@ export async function loginController(req, res){
     try{
 
      const data = req.body;
-     const check = await getLogin(data.email);
-     if(!check){
-        throw new Error ("Email not founded")
-     }
-     const compare = await comparePassword(data.password, check);
-     if(compare){
-        console.log("User confirmed");
-        res.status(200).json({message: "confirmed"})
+     const user = await getLogin(data.email);
+ 
+     const compare = await comparePassword(data.password, user.user_password);
+    
+     if(compare){     
+        const token = generateToken({
+            id: user.id,
+            email: user.user_email,
+            role: "user"
+        })
+        return res.status(200).json({message: "confirmed", token})
      }else{
-        return res.status(400).json("Password incorrect")
+        return res.status(400).jason("Password or email incorrect")
      }
     }catch(error){
-        console.log(error);
-        res.status(500).json({message: "Password or email incorrect "})
+        console.log(error); 
     }
 }
