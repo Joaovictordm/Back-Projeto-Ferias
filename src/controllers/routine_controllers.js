@@ -21,7 +21,9 @@ export async function createRoutineController(req, res){
             const newRoutine = await createRoutine({user_id, data: data.routine_name});
             res.status(201).json({message: "routine created successfully", id: newRoutine });
        
-        }else{throw new Error("Unexpected field")}
+        }else{
+            return res.status(400).json("Unexpected field")
+        }
     }catch(error){
         console.error("Erro", error.message);
         res.status(500).json({message: "error creating the routine"})
@@ -66,14 +68,14 @@ export async function deleteRoutineController(req , res){
         const check = await verifRoutine(id);
 
         if(!check){
-            return res.status(456).json({message: "routine does not exist"})
+            throw new Error ("routine does not exist")
         }
 
         if (regex.test(confirm)){
             const delRoutine = await deleteRoutine({id});
             return res.status(200).json("routine deleted")
         }else{
-            return res.status(345).json("Confirmation necessary")
+            return res.status(401).json("Confirmation necessary")
         }
     }catch(error){
         console.error("Deu erro mano: ", error.message);
@@ -93,9 +95,9 @@ export async function getRoutineByIdController(req, res){
             
             const mostrar = await getRoutineById({id});
             if(!mostrar){
-                throw new Error ("no routine registered")
+                return res.status(404).json("not found")
             }else{
-                res.status(200).json(mostrar);
+               return res.status(200).json(mostrar);
 
             }
         }

@@ -31,10 +31,10 @@ export async function createUserController(req, res){
             return res.status(400).json("Empty field")
         }
          if (!validator.isEmail(data.email)){
-            return res.status(400).json("Invalid email format")
+            return res.status(406).json("Invalid email format")
          }
          if (!specialCharRegex.test(data.name)){
-            return res.status(400).json("Invalid name format")
+            return res.status(406).json("Invalid name format")
          }
 
          if (!validator.isStrongPassword(data.password, {
@@ -45,13 +45,10 @@ export async function createUserController(req, res){
             minSymbols: 1
             
          })){
-            throw new Error ("Password must be at least 8 characters long and include 1 lowercase, 1 uppercase, 1 number, and 1 symbol.")
+            return res.status(406),json("Password must be at least 8 characters long and include 1 lowercase, 1 uppercase, 1 number, and 1 symbol.")
          }
-
-         const hash = await encryptPassword(data.password);
-         
+        const hash = await encryptPassword(data.password);
         const newUser = await createUser({name: data.name, email: data.email, password: hash});
-         
         res.status(201).json({message: "User created successfully!", id: newUser});
          
     } catch (error) {
@@ -60,7 +57,6 @@ export async function createUserController(req, res){
     }
 
 }
-
 //create user data
 export async function createDataUserController(req, res){
     try{
@@ -82,7 +78,7 @@ export async function createDataUserController(req, res){
         const physicalActivityRegex = /^(baixo|moderado|alto)$/i;
         
         if (!data.sex || !data.age || !data.weight || !data.target_weight || !data.height || !data.level_physical_activity){
-            throw new Error ("Empty field")
+            return res.status(400).json("Empty field")
         }
         const dados = {
             sex: sexoRegex,
@@ -96,23 +92,17 @@ export async function createDataUserController(req, res){
         for (const [field, regex] of Object.entries(dados)){
             
             if (!regex.test(data[field])){
-                throw new Error (`Field does not meet the expected standard ${field}`);
-            }
-            
+                return res.status(400).json(`Field does not meet the expected standard ${field}`)
+            }   
         }
-
         // const convertionNumber = ["age", "height", "weight", "target_weight"];
         // for (const convertion of convertionNumber){
         //     if (data[convertion]){
         //        data[convertion] =  parseFloat(data[convertion]);
         //     }
         // }
-  
-
         const newData = await createDataUser({user_id: user_id, data});
-        
         res.status(201).json({message: "User data created successfully!", id: newData});
-
     } catch(error){
         console.error(error.message);
         res.status(500).json({message: "Error creating user data."});
@@ -128,7 +118,6 @@ export async function getUserByIdController(req, res){
         if (!user){
             throw new Error ("User does not exist")
         }
-        
         res.status(200).json(user)
         return user
     } catch(error){
@@ -170,7 +159,7 @@ export async function editDataUserController(req, res){
         
         for (const [key, regex] of Object.entries(validations)){
             if (data[key] && !regex.test(data[key])){
-                throw new Error (`Invalid value for field ${key}`)
+                return res.status(400).json(`Invalid value for field ${key}`)
             };
         }
         
@@ -196,16 +185,13 @@ export async function editDataUserController(req, res){
                 }
             }
             const editUser = await editDataUser({data: update, id: id}); 
-                
-                
             // const editUser = await editDataUser({data,id});
-        res.status(200).json({message: "Data updated successfully!"})
+            res.status(200).json({message: "Data updated successfully!"})
     }catch(error){
         console.error(error.message);
         res.status(400).json({message: "Something went wrong."})
     }
 }
-
 //delete a user
 export async function deleteUserController(req, res){
     try{

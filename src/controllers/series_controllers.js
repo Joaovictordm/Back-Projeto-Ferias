@@ -13,7 +13,7 @@ export async function createSerieController(req, res){
         const {weight, reps} = req.body;
         const check = await exerciseId(id);
         if(!check){
-           return res.status(400).json({message: "exercise does not exist "})
+           throw new Error ("exercise does not exist ")
         }
         if (!validator.isInt(reps.toString()) || !validator.isFloat(weight.toString())){
             return res.status(404).json({message: "empty field"})
@@ -25,17 +25,14 @@ export async function createSerieController(req, res){
         console.error(error.message);
         res.status(400).json({message: "Error adding series"})
     }
-
 }
-
-
 //watch previous series
 export async function previousSerieController(req, res){
     try{
         const exercise_id = req.params.exercise_id
         const check = await exerciseId(exercise_id);
         if(!check){
-            return res.status(400).json({message: "exercise does not exist"})
+            throw new Error ("exercise does not exist")
         }else{
             const prev = await previousSerie({exercise_id});
             res.status(200).json(prev)
@@ -56,7 +53,7 @@ export async function delSerieController(req, res){
 
         
         if(!check){
-            return res.status(404).json({message: "serie does not exist"})
+            throw new Error ("serie does not exist")
         }else{
             if(regex.test(confirm)){
                 const del = delSerie({id});
@@ -65,8 +62,6 @@ export async function delSerieController(req, res){
                 return res.status(400).json("Confirmation required")
             }
         }
-
-       
     }catch(error){
         console.error(error.message);
         res.status(400).json({message: "Error deleting"})
@@ -80,7 +75,7 @@ export async function getSerieByIdController(req, res){
         const check = await exerciseId(id);
 
         if(!check){
-            return res.status(400).json("Exercise does not exist")
+            throw new Error ("Exercise does not exist")
         }else{
             const getSerie = await getSeriesById({id});
             res.status(200).json(getSerie);
