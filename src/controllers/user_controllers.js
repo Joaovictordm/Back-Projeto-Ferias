@@ -112,7 +112,7 @@ export async function createDataUserController(req, res){
 //show the user
 export async function getUserByIdController(req, res){
     try{
-        const id = req.params.id;
+        const id = req.params.di;
         const user = await getUserById({id});
 
         if (!user){
@@ -228,11 +228,10 @@ export async function loginController(req, res){
      const user = await getLogin(data.email);
  
      const compare = await comparePassword(data.password, user.user_password);
-    
+ 
      if(compare){     
         const token = generateToken({
             id: user.id,
-            email: user.user_email,
             role: "user"
         })
         return res.status(200).json({message: "confirmed", token})

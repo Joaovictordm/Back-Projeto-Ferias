@@ -102,7 +102,7 @@ export async function getLogin(email){
         const [rows] = await connection.query ("SELECT user_password, id, user_email FROM user_login WHERE user_email = ?", [email]);
 
         //Usar o return assim é bom pra quando quer retornar apenas um campo, como por exemplo o user_password. Ele vê se o rows existe e retorna o password
-        return rows[0]?.user_password;
+        return rows[0];
         //return rows[0] || null; é bom pra quando quer retornar tudo, se não tiver nada é nulo.
         //ele tava dando erro antes pq o return rows[0] || null retorna um objeto, chave e valor e o compare não espera um objeto. Por isso com o rows[0]?.user_password ele retorna só o valor do user password
 
