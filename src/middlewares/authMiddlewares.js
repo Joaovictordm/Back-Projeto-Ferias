@@ -8,7 +8,7 @@ export function authMiddleware(req, res, next){
         throw new Error("Token not provided")
     }
     //O SPLIT SEPARA STRING EM ARRAYS. Ele separa o que vier de string e coloca em um array, como por exemplo se eu enviar um "ajshdjkash askdjaksj" na string, ele vai separar em um arrray assim ["ajshdjkash", "askdjaksj"] 
-    const token = authHeader.split(" ")[1];
+    const [aux, token] = authHeader.split(" ");
     const decoded = verifyToken(token);
 
     if(!decoded){

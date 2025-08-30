@@ -17,7 +17,7 @@ const router = express.Router();
 //Cada um declara aqui um caminho. Quando cada "/" for acessado, ele chama a função declarada lá em cima e executa essa função. Isso se chama endpoint
 router.get("/getData/:id", getUserByIdController);
 router.get("/rotinaUsuario/:id", getRoutineByIdController);
-router.get("/getLogin", loginController);
+router.post("/getLogin", loginController);
 router.post("/login" , createUserController);
 router.post("/dataUser/:id", createDataUserController);
 router.patch("/editDataUser/:id", editDataUserController);
