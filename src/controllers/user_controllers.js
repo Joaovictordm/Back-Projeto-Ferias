@@ -227,17 +227,22 @@ export async function loginController(req, res){
      const data = req.body;
      const user = await getLogin(data.email);
  
-     const compare = await comparePassword(data.password, user.user_password);
- 
-     if(compare){     
-        const token = generateToken({
-            id: user.id,
-            role: "user"
-        })
-        return res.status(200).json({message: "confirmed", token})
-     }else{
-        return res.status(400).jason("Password or email incorrect")
+     if(!validator.isEmail(data.email)){
+        return res.status(400).json("Email format incorrect")
      }
+    
+     if(!user){
+        return res.status(400).json("Email or password incorrect")
+     }else{
+        const compare = await comparePassword(data.password, user.user_password);
+        if(compare){
+            const token = generateToken({id: user.id, role: "user"})
+            return res.status(200).json({id: user.id, token});
+        }else{
+            return res.status(400).json("Email or password incorrect")
+        }
+     }
+     
     }catch(error){
         console.log(error); 
     }
