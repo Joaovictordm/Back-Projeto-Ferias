@@ -37,7 +37,7 @@ export async function createDataUser({user_id, data}){
 }
 
 //query pra pegar as informações do usuário por id
-export async function getUserById({id}){
+export async function getUserById(id){
     try{
         const [data] = await connection.query(  'SELECT user_login.user_name, user_login.user_email, user_login.created_at, user_data.sex, user_data.age, user_data.weight, user_data.target_weight, user_data.height, user_data.level_physical_activity, user_data.created_at FROM user_login JOIN user_data ON user_login.id = user_data.user_id WHERE user_login.id = ?', [id] );
         return data[0]; //Está retornando o primeiro array, por isso o []. Toda query SQL retorna um array, quando for mostrar um dado sempre coloca um [0] pra ele retornar apenas os primerios valores.

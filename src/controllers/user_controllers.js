@@ -49,7 +49,7 @@ export async function createUserController(req, res){
          }
         const hash = await encryptPassword(data.password);
         const newUser = await createUser({name: data.name, email: data.email, password: hash});
-        res.status(201).json({message: "User created successfully!", id: newUser});
+        res.status(201).json({message: "User created successfully!"});
          
     } catch (error) {
         console.error(error.message);
@@ -60,7 +60,7 @@ export async function createUserController(req, res){
 //create user data
 export async function createDataUserController(req, res){
     try{
-        const user_id = req.params.id;
+        const user_id = req.user.id;
         const data = req.body;
         const user = await verifUser({id: user_id});
 
@@ -112,13 +112,14 @@ export async function createDataUserController(req, res){
 //show the user
 export async function getUserByIdController(req, res){
     try{
-        const id = req.params.di;
-        const user = await getUserById({id});
-
-        if (!user){
+        const id = req.user.id;
+        console.log(id)
+        const data = await getUserById(id);
+        console.log(data)
+        if (!data){
             throw new Error ("User does not exist")
         }
-        res.status(200).json(user)
+        res.status(200).json(data)
         return user
     } catch(error){
         console.error(error.message);
@@ -129,7 +130,7 @@ export async function getUserByIdController(req, res){
 //update an information
 export async function editDataUserController(req, res){
     try{
-        const id = req.params.id;
+        const id = req.user.id;
         const user = await verifUser({id});
     
         //Verifica se é masculino ou feminino o que recebeu
@@ -195,7 +196,7 @@ export async function editDataUserController(req, res){
 //delete a user
 export async function deleteUserController(req, res){
     try{
-        const id_login = req.params.id;
+        const id_login = req.user.id;
         const data = req.body;
         const regex = /^Deletar$/;
 
