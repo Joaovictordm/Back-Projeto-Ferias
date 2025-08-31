@@ -9,7 +9,7 @@ import validator from "validator";
 //Create a series
 export async function createSerieController(req, res){
     try{
-        const id = req.params.id;
+        const id = req.user.id;
         const {weight, reps} = req.body;
         const check = await exerciseId(id);
         if(!check){
@@ -29,7 +29,7 @@ export async function createSerieController(req, res){
 //watch previous series
 export async function previousSerieController(req, res){
     try{
-        const exercise_id = req.params.exercise_id
+        const exercise_id = req.user.id
         const check = await exerciseId(exercise_id);
         if(!check){
             throw new Error ("exercise does not exist")
@@ -46,7 +46,7 @@ export async function previousSerieController(req, res){
 //delete a series
 export async function delSerieController(req, res){
     try{
-        const id = req.params.id;
+        const id = req.user.id;
         const check = await getSerie(id);
         const {confirm} = req.body;
         const regex = /^Deletar$/;
@@ -71,7 +71,7 @@ export async function delSerieController(req, res){
 //show the series of an exercise
 export async function getSerieByIdController(req, res){
     try{
-        const id = req.params.id;
+        const id = req.user.id;
         const check = await exerciseId(id);
 
         if(!check){

@@ -8,7 +8,7 @@ import { verifRoutine } from "../models/routine_models.js";
 //Create a routine
 export async function createRoutineController(req, res){
     try{
-        const user_id = req.params.id;
+        const user_id = req.user.id;
         const data = req.body;
         
         const check = await verifUser({id: user_id});
@@ -33,7 +33,7 @@ export async function createRoutineController(req, res){
 //edit a routine
 export async function editRoutineController(req, res){
     try{
-        const id = req.params.id;
+        const id = req.user.id;
         const data = req.body;
 
         const check = await verifRoutine(id);
@@ -62,7 +62,7 @@ export async function editRoutineController(req, res){
 //delete a routine
 export async function deleteRoutineController(req , res){
     try{
-        const id = req.params.id
+        const id = req.user.id;
         const {confirm} = req.body;
         const regex = /^Deletar$/;
         const check = await verifRoutine(id);
@@ -87,7 +87,7 @@ export async function deleteRoutineController(req , res){
 //show the routines
 export async function getRoutineByIdController(req, res){
     try{
-        const id = req.params.id;
+        const id = req.user.id;
         const check = await verifUser({id});
         if (!check){
             throw new Error ("User does not exist")
