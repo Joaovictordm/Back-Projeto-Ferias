@@ -49,11 +49,11 @@ export async function createUserController(req, res){
          }
         const hash = await encryptPassword(data.password);
         const newUser = await createUser({name: data.name, email: data.email, password: hash});
-        res.status(201).json({message: "User created successfully!"});
+        res.status(201).json("User created successfully!");
          
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({message: "Error creating user."});
+        res.status(500).json("Error creating user.");
     }
 
 }
@@ -102,10 +102,10 @@ export async function createDataUserController(req, res){
         //     }
         // }
         const newData = await createDataUser({user_id: user_id, data});
-        res.status(201).json({message: "User data created successfully!", id: newData});
+        res.status(201).json("User data created successfully!", newData);
     } catch(error){
         console.error(error.message);
-        res.status(500).json({message: "Error creating user data."});
+        res.status(500).json("Error creating user data.");
     }
 }
 
@@ -113,9 +113,9 @@ export async function createDataUserController(req, res){
 export async function getUserByIdController(req, res){
     try{
         const id = req.user.id;
-        console.log(id)
+        
         const data = await getUserById(id);
-        console.log(data)
+       
         if (!data){
             throw new Error ("User does not exist")
         }
@@ -123,7 +123,7 @@ export async function getUserByIdController(req, res){
         return user
     } catch(error){
         console.error(error.message);
-        res.status(404).json({message: "User does not exist."})
+        
     }
 }
 
@@ -187,10 +187,9 @@ export async function editDataUserController(req, res){
             }
             const editUser = await editDataUser({data: update, id: id}); 
             // const editUser = await editDataUser({data,id});
-            res.status(200).json({message: "Data updated successfully!"})
+            res.status(200).json("Data updated successfully!")
     }catch(error){
         console.error(error.message);
-        res.status(400).json({message: "Something went wrong."})
     }
 }
 //delete a user
@@ -207,17 +206,16 @@ export async function deleteUserController(req, res){
         }
         
         if(!regex.test(data.delete)){
-            return res.status(401).json({message: "confirmation necessary"})
+            return res.status(401).json("confirmation necessary")
         }else{
 
             const deletar = await deleteUser({id_login});
-            res.status(200).json({message: "User deleted successfully!"})          
+            res.status(200).json("User deleted successfully!")          
 
         }
 
     }catch(error){
         console.error(error.message);
-        res.status(500).json({message: "Could not delete user."})
     }
 }
 
