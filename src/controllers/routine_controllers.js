@@ -4,6 +4,7 @@ import { deleteRoutine } from "../models/routine_models.js";
 import { getRoutineById } from "../models/routine_models.js";
 import { verifUser } from "../models/user_models.js";
 import { verifRoutine } from "../models/routine_models.js";
+import { generateToken } from "./jwt_controllers.js";
 
 //Create a routine
 export async function createRoutineController(req, res){
@@ -19,21 +20,22 @@ export async function createRoutineController(req, res){
         
         if (data.routine_name){
             const newRoutine = await createRoutine({user_id, data: data.routine_name});
-            res.status(201).json({message: "routine created successfully", id: newRoutine });
+            console.log(newRoutine)
+            const token = generateToken({id: newRoutine, role: "user"})
+            res.status(201).json({message: "routine created successfully", id: newRoutine, token: token});
        
         }else{
             return res.status(400).json("Unexpected field")
         }
     }catch(error){
         console.error("Erro", error.message);
-        res.status(500).json({message: "error creating the routine"})
     }
 }
 
 //edit a routine
 export async function editRoutineController(req, res){
     try{
-        const id = req.user.id;
+        const id = req.routine.id;
         const data = req.body;
 
         const check = await verifRoutine(id);
@@ -49,20 +51,21 @@ export async function editRoutineController(req, res){
                 update[key] = data[key];
             }
         }
-
+        
          const editName = await editRoutine({routine_name: update, id});
-         res.status(200).json({message: "updated routine"})
+         res.status(200).json("updated routine")
          
     }catch(error){
-        console.error("Deu ruim, mano: ", error.message);
-        res.status(400).json({message: "did not updtate"})
+        console.error(error);
+        res.status(401).json("Unexpected field")
+        
     }
 }
 
 //delete a routine
 export async function deleteRoutineController(req , res){
     try{
-        const id = req.user.id;
+        const id = req.routine.id;
         const {confirm} = req.body;
         const regex = /^Deletar$/;
         const check = await verifRoutine(id);
@@ -78,8 +81,7 @@ export async function deleteRoutineController(req , res){
             return res.status(401).json("Confirmation necessary")
         }
     }catch(error){
-        console.error("Deu erro mano: ", error.message);
-        res.status(400).json({message: "failed to delete"})
+        console.error(error.message);
     }
 }
 
@@ -104,7 +106,6 @@ export async function getRoutineByIdController(req, res){
 
     }catch(error){
         console.error(error.message);
-        res.status(500).json({message: "Error fetching routine."});
     }
 } 
 
